@@ -5,22 +5,9 @@ import random
 import time
 from IPython.display import clear_output
 
+
 # env = gym.make("FrozenLake-v1")
-env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=True)
-
-"""
-### Action Space
-- 0: LEFT
-- 1: DOWN
-- 2: RIGHT
-- 3: UP
-
-### Rewards
-Reward schedule:
-- Reach goal(G): +1
-- Reach hole(H): 0
-- Reach frozen(F): 0
-"""
+env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=False)
 
 action_space_size = env.action_space.n  # columns-> 4*4 -> 16
 state_space_size = env.observation_space.n  # rows -> 4
@@ -89,14 +76,23 @@ for episode in range(num_episodes):
 
         new_state, reward, done, info = env.step(action)
 
+        print("new state: ", new_state)
+        print("reward: ", reward)
+        print("done: ", done)
+        print("info: ", info)
+
         # Update Q-table for Q(s,a)
         q_table[state, action] = q_table[state, action] * (1 - learning_rate) + \
                                  learning_rate * (reward + discount_rate * np.max(q_table[new_state, :]))
 
+        print("q table: ", q_table)
         state = new_state
+        print("state", state)
         rewards_current_episode += reward
+        print("Rewards Current Episode", rewards_current_episode)
 
         if done == True:
+            print("EPISODE DONE **********************************************")
             break
 
     # Exploration rate decay
