@@ -2,57 +2,59 @@
 import numpy as np
 import gym
 import tensorflow as tf
-from IPython.display import clear_output
 
 tf.compat.v1.disable_eager_execution()
-
+from IPython.display import clear_output
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
 
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 import random
 import time
-import pygame
 
-env = gym.make('FrozenLake-v0')
+# import pygame
 
-count_actions = env.action_space.n  # columns-> 4*4 -> 16
-count_states = env.observation_space.n  # rows -> 4
+# env = gym.make('FrozenLake-v0')
+#env = gym.make("FrozenLake-v1", is_slippery=False)
+env = gym.make('FrozenLake-v1', desc=None,map_name="4x4", is_slippery=True)
+
+n_acts = env.action_space.n  # 4
+n_obv = env.observation_space.n  # 16
 
 # Actions are left, up, right, down
-print(tf.version.VERSION)
-
-print(count_actions)
+# print(tf.version.VERSION)
+#print("n_acts", n_acts)
 # States are the 16 fields
-print(count_states)
+#print("n_obv", n_obv)
 # env.render()
-
-qtable = np.zeros((count_states, count_actions))
-print(qtable)
+# qtable = np.zeros((n_obv, n_acts))
+# print(qtable)
 
 # The inputs of the NN is the state space + next action
-tf_input_size = count_states  #
+tf_input_size = n_obv  #16
 # The output of the NN is the action space
-tf_output_size = count_actions  #
+tf_output_size = n_acts  #4
 # The hidden layer size
 tf_hidden_layer_size = (tf_input_size + tf_output_size) // 2
-print(tf_input_size)
-print(tf_output_size)
-print(tf_hidden_layer_size)
+print("tf input size", tf_input_size)
+print("tf output size", tf_output_size)
+print("hidden layers", tf_hidden_layer_size)
 
 # Reset the computational graph
 tf.compat.v1.reset_default_graph()
 # tf.reset_default_graph()
 
-tf_inputs = tf.compat.v1.placeholder(tf.float32, [None, tf_input_size])
-tf_next_q = tf.compat.v1.placeholder(tf.float32, [None, tf_output_size])
+tf_inputs = tf.compat.v1.placeholder(tf.float32, [None, tf_input_size]) #16
+tf_next_q = tf.compat.v1.placeholder(tf.float32, [None, tf_output_size]) #4
 
 # Hidden Layers
-tf_weights_1 = tf.compat.v1.get_variable("tf_weights_1", [tf_input_size, tf_hidden_layer_size], initializer=tf.zeros_initializer)
+tf_weights_1 = tf.compat.v1.get_variable("tf_weights_1", [tf_input_size, tf_hidden_layer_size], #16, 10
+                                         initializer=tf.zeros_initializer)
 tf_biases_1 = tf.compat.v1.get_variable("tf_biases_1", [tf_hidden_layer_size], initializer=tf.zeros_initializer)
 tf_outputs_1 = tf.nn.relu(tf.matmul(tf_inputs, tf_weights_1) + tf_biases_1)
 
 # Output
-tf_weights_out = tf.compat.v1.get_variable("tf_weights_out", [tf_hidden_layer_size, tf_output_size], initializer=tf.zeros_initializer)
+tf_weights_out = tf.compat.v1.get_variable("tf_weights_out", [tf_hidden_layer_size, tf_output_size],
+                                           initializer=tf.zeros_initializer)
 tf_biases_out = tf.compat.v1.get_variable("tf_biases_out", [tf_output_size], initializer=tf.zeros_initializer)
 
 # Calculate the output layer
@@ -140,7 +142,7 @@ for episode in range(total_episodes):
         # Our new state is state
         state = new_state
 
-        total_rewards += y_hat
+        # total_rewards += y_hat #war nicht default drin
 
         # If done (if we're dead) : finish episode
         if done == True:
@@ -148,10 +150,11 @@ for episode in range(total_episodes):
             # Reduce epsilon (because we need less and less exploration)
             break
 
-
     epsilon = min_epsilon + (max_epsilon - min_epsilon) * np.exp(-decay_rate * episode)
 
-    rewards.append(total_rewards)
+    # rewards.append(total_rewards) #ist default drin
+    # rewards.append(y_hat) #war nicht default drin
+    rewards.append(reward)  # war nicht default drin
 
 print("Score over time: " + str(sum(rewards) / total_episodes))
 # Calculate and print the average reward per thousand episodes
@@ -165,7 +168,7 @@ for r in rewards_per_thousand_episodes:
 
 # Print updated Q-table
 print("\n\n********Q-table********\n")
-print(qtable)
+#print(qtable)
 
 for episode in range(9997, 10000):
     # initialize new episode params
@@ -182,7 +185,7 @@ for episode in range(9997, 10000):
         env.render()
         time.sleep(0.3)
 
-        action = np.argmax(qtable[state, :])
+        #action = np.argmax(qtable[state, :])
         new_state, reward, done, info = env.step(action)
 
         if done:
@@ -204,4 +207,3 @@ for episode in range(9997, 10000):
         state = new_state
 
 env.close()
-

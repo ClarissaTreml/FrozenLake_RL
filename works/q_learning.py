@@ -5,7 +5,6 @@ import random
 import time
 from IPython.display import clear_output
 
-
 # env = gym.make("FrozenLake-v1")
 env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=False)
 
@@ -58,41 +57,40 @@ for episode in range(num_episodes):
 
         # Exploration-exploitation trade-off
         exploration_rate_threshold = random.uniform(0, 1)  # For each time-step within an episode, we set our
-        print("Exploration Rate: ", exploration_rate_threshold)
+        # print("Exploration Rate: ", exploration_rate_threshold)
         # exploration_rate_threshold to a random number between 0 and 1. This will be used to determine whether our
         # agent will explore or exploit the environment in this time-step
 
         if exploration_rate_threshold > exploration_rate:
             action = np.argmax(q_table[state, :])  # exploit the environment and choose the action that has the highest
-            print("Exploit action: ", action)
+            # print("Exploit action: ", action)
             # Q-value in the Q-table for the current state. | exploitation = act of exploiting info thats already known
             # about the env in order to maximize the return
             # qtable[state,:] : all the actions we can take from current state
         else:
             action = env.action_space.sample()  # explore the environment and sample an action randomly | explore =
             # exploring env to find out info about it
-            print("Explore action: ", action)
-
+            # print("Explore action: ", action)
 
         new_state, reward, done, info = env.step(action)
 
-        print("new state: ", new_state)
-        print("reward: ", reward)
-        print("done: ", done)
-        print("info: ", info)
+        # print("new state: ", new_state)
+        # print("reward: ", reward)
+        # print("done: ", done)
+        # print("info: ", info)
 
         # Update Q-table for Q(s,a)
         q_table[state, action] = q_table[state, action] * (1 - learning_rate) + \
                                  learning_rate * (reward + discount_rate * np.max(q_table[new_state, :]))
 
-        print("q table: ", q_table)
+        # print("q table: ", q_table)
         state = new_state
-        print("state", state)
+        # print("state", state)
         rewards_current_episode += reward
-        print("Rewards Current Episode", rewards_current_episode)
+        # print("Rewards Current Episode", rewards_current_episode)
 
         if done == True:
-            print("EPISODE DONE **********************************************")
+            # print("EPISODE DONE **********************************************")
             break
 
     # Exploration rate decay

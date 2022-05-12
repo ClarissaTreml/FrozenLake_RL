@@ -5,7 +5,6 @@
 import gym
 import numpy as np
 import tensorflow as tf
-
 tf.compat.v1.disable_eager_execution()
 import pygame
 
@@ -25,11 +24,11 @@ episode_t = 0
 e = 0.1
 
 # create model
-x = tf.compat.v1.placeholder(shape=[1, 16], dtype=tf.float32)
+x = tf.compat.v1.placeholder(shape=[1, 16], dtype=tf.float32) #states
 W = tf.compat.v1.Variable(tf.compat.v1.random_uniform([16, 4], 0, 0.1))
 out = tf.matmul(x, W)
 act = tf.argmax(out, 1)
-t = tf.compat.v1.placeholder(shape=[1, 4], dtype=tf.float32)
+t = tf.compat.v1.placeholder(shape=[1, 4], dtype=tf.float32) #actions
 loss = tf.reduce_sum(tf.square(t - out))
 train_step = tf.compat.v1.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(loss)
 
